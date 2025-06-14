@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-to-Speech Indonesia</title>
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=4F23ywRg"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        select, input[type="range"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus, input[type="range"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .speed-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .speed-slider {
+            flex: 1;
+        }
+
+        .speed-value {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-secondary:disabled, .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .audio-controls {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .audio-controls.show {
+            display: block;
+        }
+
+        audio {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .speed-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Text-to-Speech</h1>
+            <p>Ubah teks menjadi suara dalam bahasa Indonesia</p>
+        </div>
+        
+        <div class="content">
+            <div id="alert-container"></div>
+            
+            <form id="ttsForm">
+                <div class="form-group">
+                    <label for="textInput">Masukkan Teks:</label>
+                    <textarea id="textInput" placeholder="Ketikkan teks yang ingin diubah menjadi suara..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="voiceSelect">Pilih Jenis Suara:</label>
+                    <select id="voiceSelect">
+                        <option value="Indonesian Female">Suara Wanita Indonesia</option>
+                        <option value="Indonesian Male">Suara Pria Indonesia</option>
+                        <option value="Indonesian Female 2">Suara Wanita Indonesia 2</option>
+                        <!-- ResponsiveVoice akan memuat suara yang tersedia -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="speedSlider">Kecepatan Bicara:</label>
+                    <div class="speed-container">
+                        <input type="range" id="speedSlider" class="speed-slider" min="0.1" max="2.0" step="0.1" value="1.0">
+                        <div class="speed-value" id="speedValue">Normal</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="formatSelect">Format File:</label>
+                    <select id="formatSelect">
+                        <option value="mp3">MP3</option>
+                        <option value="wav">WAV</option>
+                    </select>
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" id="playBtn" class="btn-primary">▶️ Putar Suara</button>
+                    <button type="button" id="pauseBtn" class="btn-secondary" disabled>⏸️ Jeda</button>
+                    <button type="button" id="stopBtn" class="btn-secondary" disabled>⏹️ Berhenti</button>
+                    <button type="button" id="downloadBtn" class="btn-success" disabled>💾 Unduh Audio</button>
+                </div>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Sedang memproses audio...</p>
+            </div>
+            
+            <div class="audio-controls" id="audioControls">
+                <audio id="audioPlayer" controls></audio>
+                <div class="download-buttons">
+                    <button id="downloadMp3" class="btn-success">⬇️ Unduh MP3</button>
+                    <button id="downloadWav" class="btn-success">⬇️ Unduh WAV</button>
+                </div>
+            </div>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🇮🇩</div>
+                    <h3>Bahasa Indonesia</h3>
+                    <p>Mendukung bahasa Indonesia dengan aksen natural</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎛️</div>
+                    <h3>Kontrol Kecepatan</h3>
+                    <p>Atur kecepatan bicara sesuai kebutuhan</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎵</div>
+                    <h3>Multi Format</h3>
+                    <p>Unduh dalam format MP3 atau WAV</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TTSApp {
+            constructor() {
+                this.currentAudio = null;
+                this.isPlaying = false;
+                this.currentText = '';
+                this.currentVoice = 'Indonesian Female';
+                this.currentRate = 1.0;
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.loadVoices();
+            }
+
+            initializeElements() {
+                this.elements = {
+                    textInput: document.getElementById('textInput'),
+                    voiceSelect: document.getElementById('voiceSelect'),
+                    speedSlider: document.getElementById('speedSlider'),
+                    speedValue: document.getElementById('speedValue'),
+                    formatSelect: document.getElementById('formatSelect'),
+                    playBtn: document.getElementById('playBtn'),
+                    pauseBtn: document.getElementById('pauseBtn'),
+                    stopBtn: document.getElementById('stopBtn'),
+                    downloadBtn: document.getElementById('downloadBtn'),
+                    audioControls: document.getElementById('audioControls'),
+                    audioPlayer: document.getElementById('audioPlayer'),
+                    loading: document.getElementById('loading'),
+                    alertContainer: document.getElementById('alert-container')
+                };
+            }
+
+            bindEvents() {
+                this.elements.speedSlider.addEventListener('input', () => this.updateSpeedValue());
+                this.elements.playBtn.addEventListener('click', () => this.playText());
+                this.elements.pauseBtn.addEventListener('click', () => this.pauseAudio());
+                this.elements.stopBtn.addEventListener('click', () => this.stopAudio());
+                this.elements.downloadBtn.addEventListener('click', () => this.downloadAudio());
+                
+                // Update speed value on load
+                this.updateSpeedValue();
+            }
+
+            loadVoices() {
+                // ResponsiveVoice voices for Indonesian
+                const indonesianVoices = [
+                    { name: 'Indonesian Female', label: 'Suara Wanita Indonesia' },
+                    { name: 'Indonesian Male', label: 'Suara Pria Indonesia' },
+                ];
+
+                this.elements.voiceSelect.innerHTML = '';
+                indonesianVoices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = voice.label;
+                    this.elements.voiceSelect.appendChild(option);
+                });
+            }
+
+            updateSpeedValue() {
+                const speed = parseFloat(this.elements.speedSlider.value);
+                let speedLabel = 'Normal';
+                
+                if (speed < 0.7) speedLabel = 'Lambat';
+                else if (speed > 1.3) speedLabel = 'Cepat';
+                
+                this.elements.speedValue.textContent = speedLabel;
+                this.currentRate = speed;
+            }
+
+            showAlert(message, type = 'success') {
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+                this.elements.alertContainer.innerHTML = `
+                    <div class="alert ${alertClass}">
+                        ${message}
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    this.elements.alertContainer.innerHTML = '';
+                }, 5000);
+            }
+
+            playText() {
+                const text = this.elements.textInput.value.trim();
+                if (!text) {
+                    this.showAlert('Silakan masukkan teks terlebih dahulu!', 'error');
+                    return;
+                }
+
+                this.currentText = text;
+                this.currentVoice = this.elements.voiceSelect.value;
+                
+                // Stop any currently playing audio
+                if (responsiveVoice.isPlaying()) {
+                    responsiveVoice.cancel();
+                }
+
+                // Play using ResponsiveVoice
+                responsiveVoice.speak(text, this.currentVoice, {
+                    rate: this.currentRate,
+                    pitch: 1,
+                    volume: 1,
+                    onstart: () => {
+                        this.isPlaying = true;
+                        this.updateButtonStates();
+                        this.showAlert('Memulai pemutaran audio...');
+                    },
+                    onend: () => {
+                        this.isPlaying = false;
+                        this.updateButtonStates();
+                        this.showAlert('Pemutaran selesai!');
+                    },
+                    onerror: (error) => {
+                        this.isPlaying = false;
+                        this.updateButtonStates();
+                        this.showAlert('Terjadi kesalahan saat memutar audio!', 'error');
+                    }
+                });
+            }
+
+            pauseAudio() {
+                if (responsiveVoice.isPlaying()) {
+                    responsiveVoice.pause();
+                    this.isPlaying = false;
+                    this.updateButtonStates();
+                    this.showAlert('Audio dijeda');
+                }
+            }
+
+            stopAudio() {
+                responsiveVoice.cancel();
+                this.isPlaying = false;
+                this.updateButtonStates();
+                this.showAlert('Audio dihentikan');
+            }
+
+            updateButtonStates() {
+                this.elements.playBtn.disabled = this.isPlaying;
+                this.elements.pauseBtn.disabled = !this.isPlaying;
+                this.elements.stopBtn.disabled = !this.isPlaying;
+                this.elements.downloadBtn.disabled = !this.currentText;
+            }
+
+            async downloadAudio() {
+                if (!this.currentText) {
+                    this.showAlert('Tidak ada audio untuk diunduh!', 'error');
+                    return;
+                }
+
+                this.elements.loading.style.display = 'block';
+                
+                try {
+                    const response = await fetch('/synthesize', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            text: this.currentText,
+                            voice: this.currentVoice,
+                            rate: this.currentRate,
+                            format: this.elements.formatSelect.value
+                        })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Create download link
+                        const a = document.createElement('a');
+                        a.href = result.audio_url;
+                        a.download = `tts_audio.${this.elements.formatSelect.value}`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        
+                        this.showAlert('Audio berhasil diunduh!');
+                    } else {
+                        this.showAlert(result.error || 'Gagal mengunduh audio!', 'error');
+                    }
+                } catch (error) {
+                    this.showAlert('Terjadi kesalahan jaringan!', 'error');
+                } finally {
+                    this.elements.loading.style.display = 'none';
+                }
+            }
+        }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait for ResponsiveVoice to load
+            if (typeof responsiveVoice !== 'undefined') {
+                new TTSApp();
+            } else {
+                setTimeout(() => {
+                    new TTSApp();
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>
