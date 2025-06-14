@@ -160,7 +160,7 @@
             background: #218838;
         }
 
-        .btn-secondary:disabled, .btn-primary:disabled {
+        .btn-secondary:disabled, .btn-primary:disabled, .btn-success:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
@@ -248,6 +248,17 @@
             margin-bottom: 10px;
         }
 
+        .char-counter {
+            text-align: right;
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .char-counter.warning {
+            color: #ff6b35;
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -290,7 +301,8 @@
             <form id="ttsForm">
                 <div class="form-group">
                     <label for="textInput">Masukkan Teks:</label>
-                    <textarea id="textInput" placeholder="Ketikkan teks yang ingin diubah menjadi suara..." required></textarea>
+                    <textarea id="textInput" placeholder="Ketikkan teks yang ingin diubah menjadi suara..." required maxlength="1000"></textarea>
+                    <div class="char-counter" id="charCounter">0/1000</div>
                 </div>
                 
                 <div class="form-group">
@@ -298,8 +310,6 @@
                     <select id="voiceSelect">
                         <option value="Indonesian Female">Suara Wanita Indonesia</option>
                         <option value="Indonesian Male">Suara Pria Indonesia</option>
-                        <option value="Indonesian Female 2">Suara Wanita Indonesia 2</option>
-                        <!-- ResponsiveVoice akan memuat suara yang tersedia -->
                     </select>
                 </div>
                 
@@ -323,7 +333,7 @@
                     <button type="button" id="playBtn" class="btn-primary">▶️ Putar Suara</button>
                     <button type="button" id="pauseBtn" class="btn-secondary" disabled>⏸️ Jeda</button>
                     <button type="button" id="stopBtn" class="btn-secondary" disabled>⏹️ Berhenti</button>
-                    <button type="button" id="downloadBtn" class="btn-success" disabled>💾 Unduh Audio</button>
+                    <button type="button" id="downloadBtn" class="btn-success">💾 Unduh Audio</button>
                 </div>
             </form>
 
@@ -336,7 +346,6 @@
                 <audio id="audioPlayer" controls></audio>
                 <div class="download-buttons">
                     <button id="downloadMp3" class="btn-success">⬇️ Unduh MP3</button>
-                    <button id="downloadWav" class="btn-success">⬇️ Unduh WAV</button>
                 </div>
             </div>
 
@@ -353,8 +362,8 @@
                 </div>
                 <div class="feature">
                     <div class="feature-icon">🎵</div>
-                    <h3>Multi Format</h3>
-                    <p>Unduh dalam format MP3 atau WAV</p>
+                    <h3>Download Audio</h3>
+                    <p>Unduh audio dalam format MP3</p>
                 </div>
             </div>
         </div>
@@ -368,10 +377,10 @@
                 this.currentText = '';
                 this.currentVoice = 'Indonesian Female';
                 this.currentRate = 1.0;
+                this.lastGeneratedFile = null;
                 
                 this.initializeElements();
                 this.bindEvents();
-                this.loadVoices();
             }
 
             initializeElements() {
@@ -388,7 +397,8 @@
                     audioControls: document.getElementById('audioControls'),
                     audioPlayer: document.getElementById('audioPlayer'),
                     loading: document.getElementById('loading'),
-                    alertContainer: document.getElementById('alert-container')
+                    alertContainer: document.getElementById('alert-container'),
+                    charCounter: document.getElementById('charCounter')
                 };
             }
 
@@ -398,25 +408,23 @@
                 this.elements.pauseBtn.addEventListener('click', () => this.pauseAudio());
                 this.elements.stopBtn.addEventListener('click', () => this.stopAudio());
                 this.elements.downloadBtn.addEventListener('click', () => this.downloadAudio());
+                this.elements.textInput.addEventListener('input', () => this.updateCharCounter());
                 
                 // Update speed value on load
                 this.updateSpeedValue();
+                this.updateCharCounter();
             }
 
-            loadVoices() {
-                // ResponsiveVoice voices for Indonesian
-                const indonesianVoices = [
-                    { name: 'Indonesian Female', label: 'Suara Wanita Indonesia' },
-                    { name: 'Indonesian Male', label: 'Suara Pria Indonesia' },
-                ];
-
-                this.elements.voiceSelect.innerHTML = '';
-                indonesianVoices.forEach(voice => {
-                    const option = document.createElement('option');
-                    option.value = voice.name;
-                    option.textContent = voice.label;
-                    this.elements.voiceSelect.appendChild(option);
-                });
+            updateCharCounter() {
+                const text = this.elements.textInput.value;
+                const length = text.length;
+                this.elements.charCounter.textContent = `${length}/1000`;
+                
+                if (length > 800) {
+                    this.elements.charCounter.classList.add('warning');
+                } else {
+                    this.elements.charCounter.classList.remove('warning');
+                }
             }
 
             updateSpeedValue() {
@@ -447,6 +455,11 @@
                 const text = this.elements.textInput.value.trim();
                 if (!text) {
                     this.showAlert('Silakan masukkan teks terlebih dahulu!', 'error');
+                    return;
+                }
+
+                if (text.length > 1000) {
+                    this.showAlert('Teks terlalu panjang! Maksimal 1000 karakter.', 'error');
                     return;
                 }
 
@@ -501,16 +514,22 @@
                 this.elements.playBtn.disabled = this.isPlaying;
                 this.elements.pauseBtn.disabled = !this.isPlaying;
                 this.elements.stopBtn.disabled = !this.isPlaying;
-                this.elements.downloadBtn.disabled = !this.currentText;
             }
 
             async downloadAudio() {
-                if (!this.currentText) {
-                    this.showAlert('Tidak ada audio untuk diunduh!', 'error');
+                const text = this.elements.textInput.value.trim();
+                if (!text) {
+                    this.showAlert('Tidak ada teks untuk dikonversi!', 'error');
+                    return;
+                }
+
+                if (text.length > 1000) {
+                    this.showAlert('Teks terlalu panjang! Maksimal 1000 karakter.', 'error');
                     return;
                 }
 
                 this.elements.loading.style.display = 'block';
+                this.elements.downloadBtn.disabled = true;
                 
                 try {
                     const response = await fetch('/synthesize', {
@@ -519,8 +538,8 @@
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            text: this.currentText,
-                            voice: this.currentVoice,
+                            text: text,
+                            voice: this.elements.voiceSelect.value,
                             rate: this.currentRate,
                             format: this.elements.formatSelect.value
                         })
@@ -529,22 +548,30 @@
                     const result = await response.json();
                     
                     if (result.success) {
+                        this.lastGeneratedFile = result.filename;
+                        
+                        // Set up audio player
+                        this.elements.audioPlayer.src = result.audio_url;
+                        this.elements.audioControls.classList.add('show');
+                        
                         // Create download link
                         const a = document.createElement('a');
                         a.href = result.audio_url;
-                        a.download = `tts_audio.${this.elements.formatSelect.value}`;
+                        a.download = result.filename;
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
                         
-                        this.showAlert('Audio berhasil diunduh!');
+                        this.showAlert('Audio berhasil dibuat dan diunduh!');
                     } else {
-                        this.showAlert(result.error || 'Gagal mengunduh audio!', 'error');
+                        this.showAlert(result.error || 'Gagal membuat audio!', 'error');
                     }
                 } catch (error) {
-                    this.showAlert('Terjadi kesalahan jaringan!', 'error');
+                    console.error('Download error:', error);
+                    this.showAlert('Terjadi kesalahan jaringan! Pastikan server Flask berjalan.', 'error');
                 } finally {
                     this.elements.loading.style.display = 'none';
+                    this.elements.downloadBtn.disabled = false;
                 }
             }
         }
@@ -552,13 +579,14 @@
         // Initialize app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             // Wait for ResponsiveVoice to load
-            if (typeof responsiveVoice !== 'undefined') {
-                new TTSApp();
-            } else {
-                setTimeout(() => {
+            const initApp = () => {
+                if (typeof responsiveVoice !== 'undefined') {
                     new TTSApp();
-                }, 1000);
-            }
+                } else {
+                    setTimeout(initApp, 500);
+                }
+            };
+            initApp();
         });
     </script>
 </body>
