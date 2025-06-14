@@ -302,6 +302,8 @@
                 <div class="form-group">
                     <label for="textInput">Masukkan Teks:</label>
                     <textarea id="textInput" placeholder="Ketikkan teks yang ingin diubah menjadi suara..." required maxlength="1000"></textarea>
+                    <button type="button" id="micBtn" class="btn-mic">🎙️ Ucapkan</button>
+                    <small id="sttStatus" style="display:block; margin-top:5px; color:gray;"></small>
                     <div class="char-counter" id="charCounter">0/1000</div>
                 </div>
                 
@@ -378,11 +380,14 @@
                 this.currentVoice = 'Indonesian Female';
                 this.currentRate = 1.0;
                 this.lastGeneratedFile = null;
+                this.recognition = null;
+                this.isRecording = false;
+
                 
                 this.initializeElements();
                 this.bindEvents();
             }
-
+        
             initializeElements() {
                 this.elements = {
                     textInput: document.getElementById('textInput'),
@@ -398,7 +403,9 @@
                     audioPlayer: document.getElementById('audioPlayer'),
                     loading: document.getElementById('loading'),
                     alertContainer: document.getElementById('alert-container'),
-                    charCounter: document.getElementById('charCounter')
+                    charCounter: document.getElementById('charCounter'),
+                    micBtn: document.getElementById('micBtn'),
+                    sttStatus: document.getElementById('sttStatus'),
                 };
             }
 
@@ -409,6 +416,8 @@
                 this.elements.stopBtn.addEventListener('click', () => this.stopAudio());
                 this.elements.downloadBtn.addEventListener('click', () => this.downloadAudio());
                 this.elements.textInput.addEventListener('input', () => this.updateCharCounter());
+                this.elements.micBtn.addEventListener('click', () => this.toggleSpeechToText());
+                this.initializeSpeechToText();
                 
                 // Update speed value on load
                 this.updateSpeedValue();
@@ -574,6 +583,54 @@
                     this.elements.downloadBtn.disabled = false;
                 }
             }
+            
+            initializeSpeechToText() {
+                if ('webkitSpeechRecognition' in window) {
+                    this.recognition = new webkitSpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.lang = 'id-ID';
+                    this.recognition.interimResults = false;
+
+                    this.recognition.onstart = () => {
+                        this.isRecording = true;
+                        this.elements.sttStatus.textContent = '🎤 Mendengarkan...';
+                        this.elements.micBtn.textContent = '🛑 Stop';
+                    };
+
+                    this.recognition.onresult = (event) => {
+                        const result = event.results[0][0].transcript;
+                        this.elements.textInput.value += (this.elements.textInput.value ? ' ' : '') + result;
+                        this.updateCharCounter();
+                    };
+
+                    this.recognition.onerror = (event) => {
+                        console.error('STT Error:', event.error);
+                        this.elements.sttStatus.textContent = `⚠️ Error: ${event.error}`;
+                        this.isRecording = false;
+                        this.elements.micBtn.textContent = '🎙️ Ucapkan';
+                    };
+
+                    this.recognition.onend = () => {
+                        this.isRecording = false;
+                        this.elements.sttStatus.textContent = '✅ Selesai merekam';
+                        this.elements.micBtn.textContent = '🎙️ Ucapkan';
+                    };
+                } else {
+                    this.elements.micBtn.disabled = true;
+                    this.elements.sttStatus.textContent = 'Browser tidak mendukung Speech Recognition';
+                }
+            }
+
+            toggleSpeechToText() {
+                if (!this.recognition) return;
+
+                if (!this.isRecording) {
+                    this.recognition.start();
+                } else {
+                    this.recognition.stop();
+                }
+            }
+
         }
 
         // Initialize app when DOM is loaded
@@ -588,6 +645,7 @@
             };
             initApp();
         });
+    
     </script>
 </body>
 </html>
