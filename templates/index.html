@@ -663,6 +663,9 @@
       let aslInterval = null;
       let stream = null;
       let isDetecting = false;
+      let isPaused = false;
+      let pausedText = "";
+      let pausedPosition = 0;
 
       // Show alert function
       function showAlert(message, type = "success") {
@@ -731,8 +734,73 @@
           }
         });
 
+      document.getElementById("playBtn").addEventListener("click", function () {
+        const text = document.getElementById("textInput").value.trim();
+        const voice = document.getElementById("voiceSelect").value;
+        const rate = parseFloat(document.getElementById("speedSlider").value);
+
+        if (!text) {
+          showAlert("Harap masukkan teks terlebih dahulu!", "error");
+          return;
+        }
+
+        if (text.length > 1000) {
+          showAlert("Teks terlalu panjang! Maksimal 1000 karakter.", "error");
+          return;
+        }
+
+        // Stop any currently playing audio
+        if (responsiveVoice.isPlaying()) {
+          responsiveVoice.cancel();
+        }
+
+        // Play using ResponsiveVoice
+        responsiveVoice.speak(text, voice, {
+          rate: rate,
+          pitch: 1,
+          volume: 1,
+          onstart: () => {
+            isPlaying = true;
+            document.getElementById("pauseBtn").disabled = false;
+            document.getElementById("stopBtn").disabled = false;
+            document.getElementById("downloadBtn").disabled = false; // Aktifkan download
+            showAlert("Memulai pemutaran audio...");
+          },
+          onend: () => {
+            resetButtonStates();
+            showAlert("Pemutaran selesai!");
+          },
+          onerror: (error) => {
+            resetButtonStates();
+            showAlert("Terjadi kesalahan saat memutar audio!", "error");
+          },
+        });
+      });
       document
-        .getElementById("playBtn")
+  .getElementById("pauseBtn")
+  .addEventListener("click", function () {
+    if (responsiveVoice.isPlaying() && isPlaying) {
+      responsiveVoice.pause();
+      isPlaying = false;
+      this.textContent = "▶️ Lanjut";
+      showAlert("Audio dijeda");
+    } else if (!isPlaying && this.textContent === "▶️ Lanjut") {
+      responsiveVoice.resume();
+      isPlaying = true;
+      this.textContent = "⏸️ Jeda";
+      showAlert("Melanjutkan pemutaran...");
+    }
+  });
+
+      document.getElementById("stopBtn").addEventListener("click", function () {
+        responsiveVoice.cancel();
+        isPaused = false; // Reset status pause
+        resetButtonStates();
+        showAlert("Audio dihentikan");
+      });
+
+      document
+        .getElementById("downloadBtn")
         .addEventListener("click", async function () {
           const text = document.getElementById("textInput").value.trim();
           const voice = document.getElementById("voiceSelect").value;
@@ -740,14 +808,14 @@
           const format = document.getElementById("formatSelect").value;
 
           if (!text) {
-            showAlert("Harap masukkan teks terlebih dahulu!", "error");
+            showAlert("Tidak ada teks untuk diunduh!", "error");
             return;
           }
 
-          try {
-            document.getElementById("loading").style.display = "block";
-            this.disabled = true;
+          document.getElementById("loading").style.display = "block";
+          this.disabled = true;
 
+          try {
             const response = await fetch("/synthesize", {
               method: "POST",
               headers: {
@@ -764,79 +832,30 @@
             const result = await response.json();
 
             if (result.success) {
-              // Play audio
-              if (currentAudio) {
-                currentAudio.pause();
-              }
-
-              currentAudio = new Audio(result.audio_url);
-              downloadUrl = result.audio_url;
-
-              currentAudio.play();
-              isPlaying = true;
-
-              // Update button states
-              document.getElementById("pauseBtn").disabled = false;
-              document.getElementById("stopBtn").disabled = false;
-              document.getElementById("downloadBtn").disabled = false;
-
-              currentAudio.onended = function () {
-                resetButtonStates();
-              };
-
-              showAlert(result.message);
+              const a = document.createElement("a");
+              a.href = result.audio_url;
+              a.download = result.filename;
+              a.click();
+              showAlert("Audio berhasil diunduh!");
             } else {
               showAlert(result.error, "error");
             }
           } catch (error) {
-            showAlert("Terjadi kesalahan: " + error.message, "error");
+            showAlert("Gagal mengunduh: " + error.message, "error");
           } finally {
             document.getElementById("loading").style.display = "none";
             this.disabled = false;
           }
         });
 
-      document
-        .getElementById("pauseBtn")
-        .addEventListener("click", function () {
-          if (currentAudio && isPlaying) {
-            currentAudio.pause();
-            isPlaying = false;
-            this.textContent = "▶️ Lanjut";
-          } else if (currentAudio) {
-            currentAudio.play();
-            isPlaying = true;
-            this.textContent = "⏸️ Jeda";
-          }
-        });
-
-      document.getElementById("stopBtn").addEventListener("click", function () {
-        if (currentAudio) {
-          currentAudio.pause();
-          currentAudio.currentTime = 0;
-          resetButtonStates();
-        }
-      });
-
-      document
-        .getElementById("downloadBtn")
-        .addEventListener("click", function () {
-          if (downloadUrl) {
-            const a = document.createElement("a");
-            a.href = downloadUrl;
-            a.download =
-              "tts_audio." + document.getElementById("formatSelect").value;
-            a.click();
-          }
-        });
-
       function resetButtonStates() {
         isPlaying = false;
+        isPaused = false;
+        pausedPosition = 0;
         document.getElementById("pauseBtn").disabled = true;
         document.getElementById("pauseBtn").textContent = "⏸️ Jeda";
         document.getElementById("stopBtn").disabled = true;
       }
-
       // ASL Functions
       document
         .getElementById("startCameraBtn")
