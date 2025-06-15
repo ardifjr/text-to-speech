@@ -1,697 +1,1390 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text-to-Speech Indonesia</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text-to-Speech Indonesia dengan ASL</title>
     <script src="https://code.responsivevoice.org/responsivevoice.js?key=4F23ywRg"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
 
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: 1.1em;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .tabs {
+        display: flex;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #e1e5e9;
+      }
+
+      .tab {
+        padding: 15px 30px;
+        background: none;
+        border: none;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        color: #666;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .tab.active {
+        color: #667eea;
+        border-bottom-color: #667eea;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+        font-size: 1.1em;
+      }
+
+      textarea {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        font-size: 16px;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 120px;
+        transition: border-color 0.3s ease;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      select,
+      input[type="range"] {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        font-size: 16px;
+        background: white;
+        transition: border-color 0.3s ease;
+      }
+
+      select:focus,
+      input[type="range"]:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .speed-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .speed-slider {
+        flex: 1;
+      }
+
+      .speed-value {
+        background: #667eea;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        min-width: 80px;
+        text-align: center;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        flex: 1;
+        padding: 15px 25px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 120px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background: #5a6268;
+      }
+
+      .btn-success {
+        background: #28a745;
+        color: white;
+      }
+
+      .btn-success:hover {
+        background: #218838;
+      }
+
+      .btn-danger {
+        background: #dc3545;
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #c82333;
+      }
+
+      .btn-warning {
+        background: #ffc107;
+        color: #212529;
+      }
+
+      .btn-warning:hover {
+        background: #e0a800;
+      }
+
+      .btn-secondary:disabled,
+      .btn-primary:disabled,
+      .btn-success:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* ASL Specific Styles */
+      .asl-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+      }
+
+      .asl-camera {
+        position: relative;
+      }
+
+      .asl-video {
+        width: 100%;
+        height: 300px;
+        border: 3px solid #667eea;
+        border-radius: 15px;
+        background: #f8f9fa;
+      }
+
+      .asl-overlay {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 200px;
+        height: 200px;
+        border: 3px solid #ff0000;
+        border-radius: 10px;
+        pointer-events: none;
+      }
+
+      .asl-status {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        border: 2px solid #e1e5e9;
+      }
+
+      .status-item {
+        margin-bottom: 15px;
+        padding: 10px;
+        background: white;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+      }
+
+      .status-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .status-value {
+        font-size: 1.2em;
+        color: #667eea;
+        font-weight: 700;
+      }
+
+      .suggestions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .suggestion-btn {
+        padding: 8px 16px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .suggestion-btn:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+      }
+
+      .asl-controls {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      .char-counter {
+        text-align: right;
+        font-size: 0.9em;
+        color: #666;
+        margin-top: 5px;
+      }
+
+      .char-counter.warning {
+        color: #ff6b35;
+      }
+
+      .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 500;
+      }
+
+      .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+      }
+
+      .feature {
+        text-align: center;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+      }
+
+      .feature-icon {
+        font-size: 2em;
+        margin-bottom: 10px;
+      }
+
+      .asl-text-display {
+        background: #f8f9fa;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+        min-height: 80px;
+        font-size: 1.1em;
+        line-height: 1.5;
+      }
+
+      .camera-indicator {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 12px;
+        height: 12px;
+        background: #dc3545;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+
+      .camera-indicator.active {
+        background: #28a745;
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 768px) {
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
+          margin: 10px;
+          border-radius: 15px;
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
+          padding: 20px;
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+          font-size: 2em;
         }
 
         .content {
-            padding: 40px;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-            font-size: 1.1em;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 16px;
-            font-family: inherit;
-            resize: vertical;
-            min-height: 120px;
-            transition: border-color 0.3s ease;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        select, input[type="range"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            background: white;
-            transition: border-color 0.3s ease;
-        }
-
-        select:focus, input[type="range"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .speed-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .speed-slider {
-            flex: 1;
-        }
-
-        .speed-value {
-            background: #667eea;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            min-width: 80px;
-            text-align: center;
+          padding: 20px;
         }
 
         .button-group {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
+          flex-direction: column;
         }
 
-        button {
-            flex: 1;
-            padding: 15px 25px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 120px;
+        .speed-container {
+          flex-direction: column;
+          align-items: stretch;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .asl-container {
+          grid-template-columns: 1fr;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        .tabs {
+          overflow-x: auto;
         }
 
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
+        .tab {
+          min-width: 150px;
         }
 
-        .btn-secondary:hover {
-            background: #5a6268;
+        .asl-controls {
+          flex-direction: column;
         }
-
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #218838;
-        }
-
-        .btn-secondary:disabled, .btn-primary:disabled, .btn-success:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .audio-controls {
-            margin-top: 25px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            display: none;
-        }
-
-        .audio-controls.show {
-            display: block;
-        }
-
-        audio {
-            width: 100%;
-            margin-bottom: 15px;
-        }
-
-        .download-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .feature {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-
-        .feature-icon {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-
-        .char-counter {
-            text-align: right;
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .btn-gesture {
-            background-color: #ff9800;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            color: white;
-            cursor: pointer;
-            margin-left: 8px;
-        }
-
-        .btn-gesture:hover {
-            background-color: #fb8c00;
-        }
-
-        .char-counter.warning {
-            color: #ff6b35;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                border-radius: 15px;
-            }
-            
-            .header {
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .content {
-                padding: 20px;
-            }
-            
-            .button-group {
-                flex-direction: column;
-            }
-            
-            .speed-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="header">
-            <h1>Text-to-Speech</h1>
-            <p>Ubah teks menjadi suara dalam bahasa Indonesia</p>
+      <div class="header">
+        <h1>Text-to-Speech + ASL</h1>
+        <p>Ubah teks dan bahasa isyarat menjadi suara dalam bahasa Indonesia</p>
+      </div>
+
+      <div class="content">
+        <div id="alert-container"></div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab active" onclick="showTab('tts')">
+            📝 Text-to-Speech
+          </button>
+          <button class="tab" onclick="showTab('asl')">
+            🤟 Bahasa Isyarat
+          </button>
         </div>
-        
-        <div class="content">
-            <div id="alert-container"></div>
-            
-            <form id="ttsForm">
-                <div class="form-group">
-                    <label for="textInput">Masukkan Teks:</label>
-                    <textarea id="textInput" placeholder="Ketikkan teks yang ingin diubah menjadi suara..." required maxlength="1000"></textarea>
-                    <button type="button" id="micBtn" class="btn-mic">🎙️ Ucapkan</button>
-                    <small id="sttStatus" style="display:block; margin-top:5px; color:gray;"></small>
-                    <div class="char-counter" id="charCounter">0/1000</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="voiceSelect">Pilih Jenis Suara:</label>
-                    <select id="voiceSelect">
-                        <option value="Indonesian Female">Suara Wanita Indonesia</option>
-                        <option value="Indonesian Male">Suara Pria Indonesia</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="speedSlider">Kecepatan Bicara:</label>
-                    <div class="speed-container">
-                        <input type="range" id="speedSlider" class="speed-slider" min="0.1" max="2.0" step="0.1" value="1.0">
-                        <div class="speed-value" id="speedValue">Normal</div>
-                    </div>
-                </div>
 
-                <div class="form-group">
-                    <label for="formatSelect">Format File:</label>
-                    <select id="formatSelect">
-                        <option value="mp3">MP3</option>
-                        <option value="wav">WAV</option>
-                    </select>
-                </div>
-                
-                <div class="button-group">
-                    <button type="button" id="aslBtn" class="btn-gesture">🤟 Bahasa Isyarat</button>
-                    <button type="button" id="playBtn" class="btn-primary">▶️ Putar Suara</button>
-                    <button type="button" id="pauseBtn" class="btn-secondary" disabled>⏸️ Jeda</button>
-                    <button type="button" id="stopBtn" class="btn-secondary" disabled>⏹️ Berhenti</button>
-                    <button type="button" id="downloadBtn" class="btn-success">💾 Unduh Audio</button>
-                </div>
-                <small id="aslStatus" style="display:block; margin-top:5px; color:gray;"></small>
-            </form>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Sedang memproses audio...</p>
-            </div>
-            
-            <div class="audio-controls" id="audioControls">
-                <audio id="audioPlayer" controls></audio>
-                <div class="download-buttons">
-                    <button id="downloadMp3" class="btn-success">⬇️ Unduh MP3</button>
-                </div>
+        <!-- TTS Tab -->
+        <div id="tts-tab" class="tab-content active">
+          <form id="ttsForm">
+            <div class="form-group">
+              <label for="textInput">Masukkan Teks:</label>
+              <textarea
+                id="textInput"
+                placeholder="Ketikkan teks yang ingin diubah menjadi suara..."
+                required
+                maxlength="1000"
+              ></textarea>
+              <button type="button" id="micBtn" class="btn-warning">
+                🎙️ Ucapkan
+              </button>
+              <small
+                id="sttStatus"
+                style="display: block; margin-top: 5px; color: gray"
+              ></small>
+              <div class="char-counter" id="charCounter">0/1000</div>
             </div>
 
-            <div class="features">
-                <div class="feature">
-                    <div class="feature-icon">🇮🇩</div>
-                    <h3>Bahasa Indonesia</h3>
-                    <p>Mendukung bahasa Indonesia dengan aksen natural</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🎛️</div>
-                    <h3>Kontrol Kecepatan</h3>
-                    <p>Atur kecepatan bicara sesuai kebutuhan</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🎵</div>
-                    <h3>Download Audio</h3>
-                    <p>Unduh audio dalam format MP3</p>
-                </div>
+            <div class="form-group">
+              <label for="voiceSelect">Pilih Jenis Suara:</label>
+              <select id="voiceSelect">
+                <option value="Indonesian Female">
+                  Suara Wanita Indonesia
+                </option>
+                <option value="Indonesian Male">Suara Pria Indonesia</option>
+              </select>
             </div>
+
+            <div class="form-group">
+              <label for="speedSlider">Kecepatan Bicara:</label>
+              <div class="speed-container">
+                <input
+                  type="range"
+                  id="speedSlider"
+                  class="speed-slider"
+                  min="0.1"
+                  max="2.0"
+                  step="0.1"
+                  value="1.0"
+                />
+                <div class="speed-value" id="speedValue">Normal</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="formatSelect">Format File:</label>
+              <select id="formatSelect">
+                <option value="mp3">MP3</option>
+                <option value="wav">WAV</option>
+              </select>
+            </div>
+
+            <div class="button-group">
+              <button type="button" id="playBtn" class="btn-primary">
+                ▶️ Putar Suara
+              </button>
+              <button
+                type="button"
+                id="pauseBtn"
+                class="btn-secondary"
+                disabled
+              >
+                ⏸️ Jeda
+              </button>
+              <button type="button" id="stopBtn" class="btn-secondary" disabled>
+                ⏹️ Berhenti
+              </button>
+              <button
+                type="button"
+                id="downloadBtn"
+                class="btn-success"
+                disabled
+              >
+                💾 Unduh Audio
+              </button>
+            </div>
+          </form>
+
+          <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Memproses audio...</p>
+          </div>
+
+          <div class="features">
+            <div class="feature">
+              <div class="feature-icon">🎤</div>
+              <h3>Input Suara</h3>
+              <p>Gunakan mikrofon untuk input teks</p>
+            </div>
+            <div class="feature">
+              <div class="feature-icon">🔊</div>
+              <h3>TTS Indonesia</h3>
+              <p>Sintesis suara bahasa Indonesia</p>
+            </div>
+            <div class="feature">
+              <div class="feature-icon">💾</div>
+              <h3>Unduh Audio</h3>
+              <p>Simpan hasil dalam format MP3/WAV</p>
+            </div>
+          </div>
         </div>
+
+        <!-- ASL Tab -->
+        <div id="asl-tab" class="tab-content">
+          <div class="asl-container">
+            <div class="asl-camera">
+              <video id="aslVideo" class="asl-video" autoplay muted></video>
+              <div class="asl-overlay"></div>
+              <div class="camera-indicator" id="cameraIndicator"></div>
+              <canvas id="canvasOutput" style="display: none"></canvas>
+            </div>
+
+            <div class="asl-status">
+              <div class="status-item">
+                <div class="status-label">Huruf Terdeteksi:</div>
+                <div class="status-value" id="currentSymbol">-</div>
+              </div>
+
+              <div class="status-item">
+                <div class="status-label">Kata Saat Ini:</div>
+                <div class="status-value" id="currentWord">-</div>
+              </div>
+
+              <div class="status-item">
+                <div class="status-label">Saran Kata:</div>
+                <div class="suggestions" id="suggestions"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="aslText">Teks dari Bahasa Isyarat:</label>
+            <div class="asl-text-display" id="aslText">
+              Mulai kamera untuk mendeteksi bahasa isyarat...
+            </div>
+          </div>
+
+          <div class="asl-controls">
+            <button type="button" id="startCameraBtn" class="btn-primary">
+              📹 Mulai Kamera
+            </button>
+            <button
+              type="button"
+              id="stopCameraBtn"
+              class="btn-secondary"
+              disabled
+            >
+              ⏹️ Berhenti Kamera
+            </button>
+            <button type="button" id="resetAslBtn" class="btn-warning">
+              🔄 Reset Teks
+            </button>
+            <button type="button" id="playAslBtn" class="btn-success" disabled>
+              🔊 Putar Suara
+            </button>
+            <button
+              type="button"
+              id="copyToTtsBtn"
+              class="btn-primary"
+              disabled
+            >
+              📋 Copy ke TTS
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script>
-        class TTSApp {
-            constructor() {
-                this.currentAudio = null;
-                this.isPlaying = false;
-                this.currentText = '';
-                this.currentVoice = 'Indonesian Female';
-                this.currentRate = 1.0;
-                this.lastGeneratedFile = null;
-                this.recognition = null;
-                this.isRecording = false;
+      // Global variables
+      let isPlaying = false;
+      let currentAudio = null;
+      let downloadUrl = null;
+      let aslInterval = null;
+      let stream = null;
+      let isDetecting = false;
 
-                
-                this.initializeElements();
-                this.bindEvents();
-            }
-        
-            initializeElements() {
-                this.elements = {
-                    textInput: document.getElementById('textInput'),
-                    voiceSelect: document.getElementById('voiceSelect'),
-                    speedSlider: document.getElementById('speedSlider'),
-                    speedValue: document.getElementById('speedValue'),
-                    formatSelect: document.getElementById('formatSelect'),
-                    playBtn: document.getElementById('playBtn'),
-                    pauseBtn: document.getElementById('pauseBtn'),
-                    stopBtn: document.getElementById('stopBtn'),
-                    downloadBtn: document.getElementById('downloadBtn'),
-                    audioControls: document.getElementById('audioControls'),
-                    audioPlayer: document.getElementById('audioPlayer'),
-                    loading: document.getElementById('loading'),
-                    alertContainer: document.getElementById('alert-container'),
-                    charCounter: document.getElementById('charCounter'),
-                    micBtn: document.getElementById('micBtn'),
-                    sttStatus: document.getElementById('sttStatus'),
-                    aslBtn: document.getElementById('aslBtn'),
-                    aslStatus: document.getElementById('aslStatus'),
-                };
-            }
+      // Show alert function
+      function showAlert(message, type = "success") {
+        const alertContainer = document.getElementById("alert-container");
+        const alertDiv = document.createElement("div");
+        alertDiv.className = `alert alert-${type}`;
+        alertDiv.textContent = message;
 
-            bindEvents() {
-                this.elements.speedSlider.addEventListener('input', () => this.updateSpeedValue());
-                this.elements.playBtn.addEventListener('click', () => this.playText());
-                this.elements.pauseBtn.addEventListener('click', () => this.pauseAudio());
-                this.elements.stopBtn.addEventListener('click', () => this.stopAudio());
-                this.elements.downloadBtn.addEventListener('click', () => this.downloadAudio());
-                this.elements.textInput.addEventListener('input', () => this.updateCharCounter());
-                this.elements.micBtn.addEventListener('click', () => this.toggleSpeechToText());
-                this.initializeSpeechToText();
-                this.elements.aslBtn.addEventListener('click', () => this.toggleASLListener());
-                
-                // Update speed value on load
-                this.updateSpeedValue();
-                this.updateCharCounter();
-            }
+        alertContainer.appendChild(alertDiv);
 
-            toggleASLListener() {
-                if (this.aslInterval) {
-                    clearInterval(this.aslInterval);
-                    this.aslInterval = null;
-                    this.elements.aslStatus.textContent = '🛑 Bahasa Isyarat dimatikan';
-                    this.elements.aslBtn.textContent = '🤟 Bahasa Isyarat';
-                } else {
-                    this.aslInterval = setInterval(() => this.fetchASLText(), 1500);
-                    this.elements.aslStatus.textContent = '📡 Mendeteksi Bahasa Isyarat...';
-                    this.elements.aslBtn.textContent = '🛑 Stop ASL';
+        setTimeout(() => {
+          alertDiv.remove();
+        }, 5000);
+      }
+
+      // Tab switching
+      function showTab(tabName) {
+        // Hide all tab contents
+        document.querySelectorAll(".tab-content").forEach((content) => {
+          content.classList.remove("active");
+        });
+
+        // Remove active class from all tabs
+        document.querySelectorAll(".tab").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+
+        // Show selected tab content
+        document.getElementById(tabName + "-tab").classList.add("active");
+
+        // Add active class to clicked tab
+        event.target.classList.add("active");
+      }
+
+      // TTS Functions
+      document
+        .getElementById("textInput")
+        .addEventListener("input", function () {
+          const text = this.value;
+          const counter = document.getElementById("charCounter");
+          counter.textContent = `${text.length}/1000`;
+
+          if (text.length > 800) {
+            counter.classList.add("warning");
+          } else {
+            counter.classList.remove("warning");
+          }
+        });
+
+      document
+        .getElementById("speedSlider")
+        .addEventListener("input", function () {
+          const speed = parseFloat(this.value);
+          const speedValue = document.getElementById("speedValue");
+
+          if (speed < 0.5) {
+            speedValue.textContent = "Sangat Lambat";
+          } else if (speed < 0.8) {
+            speedValue.textContent = "Lambat";
+          } else if (speed <= 1.2) {
+            speedValue.textContent = "Normal";
+          } else if (speed <= 1.5) {
+            speedValue.textContent = "Cepat";
+          } else {
+            speedValue.textContent = "Sangat Cepat";
+          }
+        });
+
+      document
+        .getElementById("playBtn")
+        .addEventListener("click", async function () {
+          const text = document.getElementById("textInput").value.trim();
+          const voice = document.getElementById("voiceSelect").value;
+          const rate = parseFloat(document.getElementById("speedSlider").value);
+          const format = document.getElementById("formatSelect").value;
+
+          if (!text) {
+            showAlert("Harap masukkan teks terlebih dahulu!", "error");
+            return;
+          }
+
+          try {
+            document.getElementById("loading").style.display = "block";
+            this.disabled = true;
+
+            const response = await fetch("/synthesize", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                text: text,
+                voice: voice,
+                rate: rate,
+                format: format,
+              }),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+              // Play audio
+              if (currentAudio) {
+                currentAudio.pause();
+              }
+
+              currentAudio = new Audio(result.audio_url);
+              downloadUrl = result.audio_url;
+
+              currentAudio.play();
+              isPlaying = true;
+
+              // Update button states
+              document.getElementById("pauseBtn").disabled = false;
+              document.getElementById("stopBtn").disabled = false;
+              document.getElementById("downloadBtn").disabled = false;
+
+              currentAudio.onended = function () {
+                resetButtonStates();
+              };
+
+              showAlert(result.message);
+            } else {
+              showAlert(result.error, "error");
+            }
+          } catch (error) {
+            showAlert("Terjadi kesalahan: " + error.message, "error");
+          } finally {
+            document.getElementById("loading").style.display = "none";
+            this.disabled = false;
+          }
+        });
+
+      document
+        .getElementById("pauseBtn")
+        .addEventListener("click", function () {
+          if (currentAudio && isPlaying) {
+            currentAudio.pause();
+            isPlaying = false;
+            this.textContent = "▶️ Lanjut";
+          } else if (currentAudio) {
+            currentAudio.play();
+            isPlaying = true;
+            this.textContent = "⏸️ Jeda";
+          }
+        });
+
+      document.getElementById("stopBtn").addEventListener("click", function () {
+        if (currentAudio) {
+          currentAudio.pause();
+          currentAudio.currentTime = 0;
+          resetButtonStates();
+        }
+      });
+
+      document
+        .getElementById("downloadBtn")
+        .addEventListener("click", function () {
+          if (downloadUrl) {
+            const a = document.createElement("a");
+            a.href = downloadUrl;
+            a.download =
+              "tts_audio." + document.getElementById("formatSelect").value;
+            a.click();
+          }
+        });
+
+      function resetButtonStates() {
+        isPlaying = false;
+        document.getElementById("pauseBtn").disabled = true;
+        document.getElementById("pauseBtn").textContent = "⏸️ Jeda";
+        document.getElementById("stopBtn").disabled = true;
+      }
+
+      // ASL Functions
+      document
+        .getElementById("startCameraBtn")
+        .addEventListener("click", async function () {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: {
+                width: 640,
+                height: 480,
+                facingMode: "user",
+              },
+            });
+
+            const video = document.getElementById("aslVideo");
+            video.srcObject = stream;
+
+            // Update button states
+            this.disabled = true;
+            document.getElementById("stopCameraBtn").disabled = false;
+            document.getElementById("playAslBtn").disabled = false;
+            document.getElementById("copyToTtsBtn").disabled = false;
+
+            // Update camera indicator
+            document.getElementById("cameraIndicator").classList.add("active");
+
+            // Start ASL detection
+            startASLDetection();
+
+            showAlert("Kamera berhasil dimulai!");
+          } catch (error) {
+            showAlert("Gagal mengakses kamera: " + error.message, "error");
+          }
+        });
+
+      document
+        .getElementById("stopCameraBtn")
+        .addEventListener("click", function () {
+          if (stream) {
+            stream.getTracks().forEach((track) => track.stop());
+            stream = null;
+          }
+
+          // Clear detection interval
+          if (aslInterval) {
+            clearInterval(aslInterval);
+            aslInterval = null;
+          }
+
+          // Reset video
+          const video = document.getElementById("aslVideo");
+          video.srcObject = null;
+
+          // Update button states
+          document.getElementById("startCameraBtn").disabled = false;
+          this.disabled = true;
+          document.getElementById("playAslBtn").disabled = true;
+          document.getElementById("copyToTtsBtn").disabled = true;
+
+          // Update camera indicator
+          document.getElementById("cameraIndicator").classList.remove("active");
+
+          // Reset display
+          document.getElementById("aslText").textContent =
+            "Kamera dihentikan. Mulai kamera untuk mendeteksi bahasa isyarat...";
+          document.getElementById("currentSymbol").textContent = "-";
+          document.getElementById("currentWord").textContent = "-";
+          document.getElementById("suggestions").innerHTML = "";
+
+          showAlert("Kamera berhasil dihentikan!");
+        });
+
+      document
+        .getElementById("resetAslBtn")
+        .addEventListener("click", async function () {
+          try {
+            const response = await fetch("/reset-asl", {
+              method: "POST",
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+              document.getElementById("aslText").textContent =
+                "Teks direset. Mulai mendeteksi bahasa isyarat...";
+              document.getElementById("currentSymbol").textContent = "-";
+              document.getElementById("currentWord").textContent = "-";
+              document.getElementById("suggestions").innerHTML = "";
+              showAlert("Teks berhasil direset!");
+            } else {
+              showAlert(result.error, "error");
+            }
+          } catch (error) {
+            showAlert("Gagal mereset: " + error.message, "error");
+          }
+        });
+
+      document
+        .getElementById("playAslBtn")
+        .addEventListener("click", function () {
+          const aslText = document.getElementById("aslText").textContent.trim();
+
+          if (
+            !aslText ||
+            aslText === "Mulai kamera untuk mendeteksi bahasa isyarat..." ||
+            aslText ===
+              "Kamera dihentikan. Mulai kamera untuk mendeteksi bahasa isyarat..."
+          ) {
+            showAlert("Tidak ada teks untuk diputar!", "error");
+            return;
+          }
+
+          // Use ResponsiveVoice to play ASL text
+          if (window.responsiveVoice) {
+            responsiveVoice.speak(aslText, "Indonesian Female", {
+              rate: 1.0,
+              pitch: 1,
+              volume: 1,
+            });
+            showAlert("Memutar teks dari bahasa isyarat...");
+          } else {
+            showAlert("TTS tidak tersedia", "error");
+          }
+        });
+
+      document
+        .getElementById("copyToTtsBtn")
+        .addEventListener("click", function () {
+          const aslText = document.getElementById("aslText").textContent.trim();
+
+          if (
+            !aslText ||
+            aslText === "Mulai kamera untuk mendeteksi bahasa isyarat..." ||
+            aslText ===
+              "Kamera dihentikan. Mulai kamera untuk mendeteksi bahasa isyarat..."
+          ) {
+            showAlert("Tidak ada teks untuk disalin!", "error");
+            return;
+          }
+
+          // Copy to TTS textarea
+          document.getElementById("textInput").value = aslText;
+
+          // Update character counter
+          const counter = document.getElementById("charCounter");
+          counter.textContent = `${aslText.length}/1000`;
+
+          // Switch to TTS tab
+          showTab("tts");
+          document.querySelector(".tab:first-child").classList.add("active");
+          document.querySelector(".tab:last-child").classList.remove("active");
+
+          showAlert("Teks berhasil disalin ke TTS!");
+        });
+
+      function startASLDetection() {
+        const video = document.getElementById("aslVideo");
+        const canvas = document.getElementById("canvasOutput");
+        const ctx = canvas.getContext("2d");
+
+        // Set canvas size
+        canvas.width = 640;
+        canvas.height = 480;
+
+        aslInterval = setInterval(async () => {
+          if (video.readyState === video.HAVE_ENOUGH_DATA && !isDetecting) {
+            isDetecting = true;
+
+            try {
+              // Draw video frame to canvas
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+              // Convert canvas to base64
+              const imageData = canvas.toDataURL("image/jpeg", 0.8);
+
+              // Send frame to backend for processing
+              const response = await fetch("/process-asl-frame", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  image: imageData,
+                }),
+              });
+
+              const result = await response.json();
+
+              if (result.success) {
+                // Update display
+                document.getElementById("currentSymbol").textContent =
+                  result.current_symbol || "-";
+                document.getElementById("currentWord").textContent =
+                  result.current_word || "-";
+
+                // Update full text
+                const fullText =
+                  (result.sentence || "") + " " + (result.current_word || "");
+                if (fullText.trim()) {
+                  document.getElementById("aslText").textContent =
+                    fullText.trim();
                 }
-            }
 
-            async fetchASLText() {
-                try {
-                    const res = await fetch('/asl-text');
-                    const data = await res.json();
-                    if (data.text && data.text !== '') {
-                        this.elements.textInput.value += data.text + ' ';
-                        this.updateCharCounter();
-                    }
-                } catch (err) {
-                    console.error("Gagal mengambil teks ASL:", err);
-                    this.showAlert("Gagal mengambil teks dari bahasa isyarat!", 'error');
+                // Update suggestions
+                const suggestionsContainer =
+                  document.getElementById("suggestions");
+                suggestionsContainer.innerHTML = "";
+
+                if (result.suggestions && result.suggestions.length > 0) {
+                  result.suggestions.forEach((suggestion) => {
+                    const btn = document.createElement("button");
+                    btn.className = "suggestion-btn";
+                    btn.textContent = suggestion;
+                    btn.onclick = () => useSuggestion(suggestion);
+                    suggestionsContainer.appendChild(btn);
+                  });
                 }
+              }
+            } catch (error) {
+              console.error("Error processing ASL frame:", error);
             }
 
-            updateCharCounter() {
-                const text = this.elements.textInput.value;
-                const length = text.length;
-                this.elements.charCounter.textContent = `${length}/1000`;
-                
-                if (length > 800) {
-                    this.elements.charCounter.classList.add('warning');
-                } else {
-                    this.elements.charCounter.classList.remove('warning');
-                }
+            isDetecting = false;
+          }
+        }, 100); // Process every 100ms
+      }
+
+      // Function to use suggestion
+      async function useSuggestion(suggestion) {
+        try {
+          const response = await fetch("/use-suggestion", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              suggestion: suggestion,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            document.getElementById("aslText").textContent =
+              result.sentence + " " + result.current_word;
+            document.getElementById("currentWord").textContent =
+              result.current_word || "-";
+
+            // Clear suggestions
+            document.getElementById("suggestions").innerHTML = "";
+
+            showAlert("Kata berhasil dipilih!");
+          } else {
+            showAlert(result.error, "error");
+          }
+        } catch (error) {
+          showAlert("Gagal menggunakan saran: " + error.message, "error");
+        }
+      }
+
+      // Speech Recognition untuk TTS Tab
+      if (
+        "webkitSpeechRecognition" in window ||
+        "SpeechRecognition" in window
+      ) {
+        const SpeechRecognition =
+          window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = "id-ID";
+
+        let isListening = false;
+
+        document
+          .getElementById("micBtn")
+          .addEventListener("click", function () {
+            if (!isListening) {
+              recognition.start();
+              isListening = true;
+              this.textContent = "🔴 Mendengarkan...";
+              this.disabled = true;
+              document.getElementById("sttStatus").textContent =
+                "Silakan bicara...";
+            } else {
+              recognition.stop();
             }
+          });
 
-            updateSpeedValue() {
-                const speed = parseFloat(this.elements.speedSlider.value);
-                let speedLabel = 'Normal';
-                
-                if (speed < 0.7) speedLabel = 'Lambat';
-                else if (speed > 1.3) speedLabel = 'Cepat';
-                
-                this.elements.speedValue.textContent = speedLabel;
-                this.currentRate = speed;
-            }
+        recognition.onresult = function (event) {
+          const transcript = event.results[0][0].transcript;
+          document.getElementById("textInput").value = transcript;
 
-            showAlert(message, type = 'success') {
-                const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
-                this.elements.alertContainer.innerHTML = `
-                    <div class="alert ${alertClass}">
-                        ${message}
-                    </div>
-                `;
-                
-                setTimeout(() => {
-                    this.elements.alertContainer.innerHTML = '';
-                }, 5000);
-            }
+          // Update character counter
+          const counter = document.getElementById("charCounter");
+          counter.textContent = `${transcript.length}/1000`;
 
-            playText() {
-                const text = this.elements.textInput.value.trim();
-                if (!text) {
-                    this.showAlert('Silakan masukkan teks terlebih dahulu!', 'error');
-                    return;
-                }
+          showAlert("Teks berhasil direkam dari suara!");
+        };
 
-                if (text.length > 1000) {
-                    this.showAlert('Teks terlalu panjang! Maksimal 1000 karakter.', 'error');
-                    return;
-                }
+        recognition.onend = function () {
+          isListening = false;
+          document.getElementById("micBtn").textContent = "🎙️ Ucapkan";
+          document.getElementById("micBtn").disabled = false;
+          document.getElementById("sttStatus").textContent = "";
+        };
 
-                this.currentText = text;
-                this.currentVoice = this.elements.voiceSelect.value;
-                
-                // Stop any currently playing audio
-                if (responsiveVoice.isPlaying()) {
-                    responsiveVoice.cancel();
-                }
+        recognition.onerror = function (event) {
+          isListening = false;
+          document.getElementById("micBtn").textContent = "🎙️ Ucapkan";
+          document.getElementById("micBtn").disabled = false;
+          document.getElementById("sttStatus").textContent = "";
+          showAlert("Error: " + event.error, "error");
+        };
+      } else {
+        // Hide mic button if speech recognition is not supported
+        document.getElementById("micBtn").style.display = "none";
+      }
 
-                // Play using ResponsiveVoice
-                responsiveVoice.speak(text, this.currentVoice, {
-                    rate: this.currentRate,
-                    pitch: 1,
-                    volume: 1,
-                    onstart: () => {
-                        this.isPlaying = true;
-                        this.updateButtonStates();
-                        this.showAlert('Memulai pemutaran audio...');
-                    },
-                    onend: () => {
-                        this.isPlaying = false;
-                        this.updateButtonStates();
-                        this.showAlert('Pemutaran selesai!');
-                    },
-                    onerror: (error) => {
-                        this.isPlaying = false;
-                        this.updateButtonStates();
-                        this.showAlert('Terjadi kesalahan saat memutar audio!', 'error');
-                    }
-                });
-            }
+      // Auto-cleanup old files on page load
+      window.addEventListener("load", function () {
+        fetch("/cleanup")
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Cleanup result:", data);
+          })
+          .catch((error) => {
+            console.error("Cleanup error:", error);
+          });
+      });
 
-            pauseAudio() {
-                if (responsiveVoice.isPlaying()) {
-                    responsiveVoice.pause();
-                    this.isPlaying = false;
-                    this.updateButtonStates();
-                    this.showAlert('Audio dijeda');
-                }
-            }
+      // Initialize ResponsiveVoice when available
+      window.addEventListener("load", function () {
+        if (window.responsiveVoice) {
+          console.log("ResponsiveVoice initialized");
+        } else {
+          console.warn("ResponsiveVoice not loaded");
+        }
+      });
 
-            stopAudio() {
-                responsiveVoice.cancel();
-                this.isPlaying = false;
-                this.updateButtonStates();
-                this.showAlert('Audio dihentikan');
-            }
+      // Prevent form submission on enter key (optional)
+      document
+        .getElementById("textInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById("playBtn").click();
+          }
+        });
 
-            updateButtonStates() {
-                this.elements.playBtn.disabled = this.isPlaying;
-                this.elements.pauseBtn.disabled = !this.isPlaying;
-                this.elements.stopBtn.disabled = !this.isPlaying;
-            }
+      // Handle visibility change to pause/resume ASL detection
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden && aslInterval) {
+          // Pause ASL detection when tab is not visible
+          clearInterval(aslInterval);
+          aslInterval = null;
+        } else if (!document.hidden && stream && !aslInterval) {
+          // Resume ASL detection when tab becomes visible
+          startASLDetection();
+        }
+      });
 
-            async downloadAudio() {
-                const text = this.elements.textInput.value.trim();
-                if (!text) {
-                    this.showAlert('Tidak ada teks untuk dikonversi!', 'error');
-                    return;
-                }
+      // Error handling for video stream
+      document
+        .getElementById("aslVideo")
+        .addEventListener("error", function (e) {
+          console.error("Video error:", e);
+          showAlert("Error dengan stream video", "error");
+        });
 
-                if (text.length > 1000) {
-                    this.showAlert('Teks terlalu panjang! Maksimal 1000 karakter.', 'error');
-                    return;
-                }
+      // Add loading indicator for ASL processing
+      function showASLLoading(show) {
+        let loadingDiv = document.getElementById("asl-loading");
+        if (!loadingDiv) {
+          loadingDiv = document.createElement("div");
+          loadingDiv.id = "asl-loading";
+          loadingDiv.className = "loading";
+          loadingDiv.innerHTML =
+            '<div class="spinner"></div><p>Memproses gesture...</p>';
+          document.getElementById("asl-tab").appendChild(loadingDiv);
+        }
+        loadingDiv.style.display = show ? "block" : "none";
+      }
 
-                this.elements.loading.style.display = 'block';
-                this.elements.downloadBtn.disabled = true;
-                
-                try {
-                    const response = await fetch('/synthesize', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            text: text,
-                            voice: this.elements.voiceSelect.value,
-                            rate: this.currentRate,
-                            format: this.elements.formatSelect.value
-                        })
-                    });
-
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        this.lastGeneratedFile = result.filename;
-                        
-                        // Set up audio player
-                        this.elements.audioPlayer.src = result.audio_url;
-                        this.elements.audioControls.classList.add('show');
-                        
-                        // Create download link
-                        const a = document.createElement('a');
-                        a.href = result.audio_url;
-                        a.download = result.filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        
-                        this.showAlert('Audio berhasil dibuat dan diunduh!');
-                    } else {
-                        this.showAlert(result.error || 'Gagal membuat audio!', 'error');
-                    }
-                } catch (error) {
-                    console.error('Download error:', error);
-                    this.showAlert('Terjadi kesalahan jaringan! Pastikan server Flask berjalan.', 'error');
-                } finally {
-                    this.elements.loading.style.display = 'none';
-                    this.elements.downloadBtn.disabled = false;
-                }
-            }
-            
-            initializeSpeechToText() {
-                if ('webkitSpeechRecognition' in window) {
-                    this.recognition = new webkitSpeechRecognition();
-                    this.recognition.continuous = false;
-                    this.recognition.lang = 'id-ID';
-                    this.recognition.interimResults = false;
-
-                    this.recognition.onstart = () => {
-                        this.isRecording = true;
-                        this.elements.sttStatus.textContent = '🎤 Mendengarkan...';
-                        this.elements.micBtn.textContent = '🛑 Stop';
-                    };
-
-                    this.recognition.onresult = (event) => {
-                        const result = event.results[0][0].transcript;
-                        this.elements.textInput.value += (this.elements.textInput.value ? ' ' : '') + result;
-                        this.updateCharCounter();
-                    };
-
-                    this.recognition.onerror = (event) => {
-                        console.error('STT Error:', event.error);
-                        this.elements.sttStatus.textContent = `⚠️ Error: ${event.error}`;
-                        this.isRecording = false;
-                        this.elements.micBtn.textContent = '🎙️ Ucapkan';
-                    };
-
-                    this.recognition.onend = () => {
-                        this.isRecording = false;
-                        this.elements.sttStatus.textContent = '✅ Selesai merekam';
-                        this.elements.micBtn.textContent = '🎙️ Ucapkan';
-                    };
-                } else {
-                    this.elements.micBtn.disabled = true;
-                    this.elements.sttStatus.textContent = 'Browser tidak mendukung Speech Recognition';
-                }
-            }
-
-            toggleSpeechToText() {
-                if (!this.recognition) return;
-
-                if (!this.isRecording) {
-                    this.recognition.start();
-                } else {
-                    this.recognition.stop();
-                }
-            }
-
+      // Add keyboard shortcuts
+      document.addEventListener("keydown", function (e) {
+        // Ctrl + P to play TTS
+        if (e.ctrlKey && e.key === "p") {
+          e.preventDefault();
+          if (document.getElementById("tts-tab").classList.contains("active")) {
+            document.getElementById("playBtn").click();
+          } else if (
+            document.getElementById("asl-tab").classList.contains("active")
+          ) {
+            document.getElementById("playAslBtn").click();
+          }
         }
 
-        // Initialize app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            // Wait for ResponsiveVoice to load
-            const initApp = () => {
-                if (typeof responsiveVoice !== 'undefined') {
-                    new TTSApp();
-                } else {
-                    setTimeout(initApp, 500);
-                }
-            };
-            initApp();
+        // Ctrl + S to stop
+        if (e.ctrlKey && e.key === "s") {
+          e.preventDefault();
+          if (currentAudio) {
+            document.getElementById("stopBtn").click();
+          }
+        }
+
+        // Ctrl + R to reset ASL (only in ASL tab)
+        if (
+          e.ctrlKey &&
+          e.key === "r" &&
+          document.getElementById("asl-tab").classList.contains("active")
+        ) {
+          e.preventDefault();
+          document.getElementById("resetAslBtn").click();
+        }
+      });
+
+      // Add auto-save for TTS text (localStorage alternative - using sessionStorage in memory)
+      let textAutoSave = "";
+      document
+        .getElementById("textInput")
+        .addEventListener("input", function () {
+          textAutoSave = this.value;
         });
-    
+
+      // Restore text when switching tabs
+      document
+        .querySelector(".tab[onclick=\"showTab('tts')\"]")
+        .addEventListener("click", function () {
+          if (textAutoSave && !document.getElementById("textInput").value) {
+            document.getElementById("textInput").value = textAutoSave;
+          }
+        });
+
+      // Add confirmation before leaving page if ASL is active
+      window.addEventListener("beforeunload", function (e) {
+        if (stream) {
+          e.preventDefault();
+          e.returnValue =
+            "Kamera ASL masih aktif. Yakin ingin meninggalkan halaman?";
+          return e.returnValue;
+        }
+      });
+
+      // Performance optimization: throttle ASL detection
+      let lastDetectionTime = 0;
+      const DETECTION_THROTTLE = 150; // ms
+
+      function throttledASLDetection() {
+        const now = Date.now();
+        if (now - lastDetectionTime < DETECTION_THROTTLE) {
+          return;
+        }
+        lastDetectionTime = now;
+
+        // Your existing ASL detection code here
+        // This helps prevent overwhelming the server with requests
+      }
+
+      // Add better error handling for camera access
+      async function requestCameraAccess() {
+        try {
+          const constraints = {
+            video: {
+              width: { ideal: 640 },
+              height: { ideal: 480 },
+              facingMode: "user",
+              frameRate: { ideal: 15, max: 30 },
+            },
+          };
+
+          const stream = await navigator.mediaDevices.getUserMedia(constraints);
+          return stream;
+        } catch (error) {
+          let errorMessage = "Gagal mengakses kamera: ";
+
+          switch (error.name) {
+            case "NotAllowedError":
+              errorMessage +=
+                "Akses kamera ditolak. Silakan izinkan akses kamera.";
+              break;
+            case "NotFoundError":
+              errorMessage += "Kamera tidak ditemukan.";
+              break;
+            case "NotReadableError":
+              errorMessage += "Kamera sedang digunakan aplikasi lain.";
+              break;
+            default:
+              errorMessage += error.message;
+          }
+
+          throw new Error(errorMessage);
+        }
+      }
+
+      // Update the start camera button to use better error handling
+      document
+        .getElementById("startCameraBtn")
+        .addEventListener("click", async function () {
+          try {
+            stream = await requestCameraAccess();
+
+            const video = document.getElementById("aslVideo");
+            video.srcObject = stream;
+
+            // Update button states
+            this.disabled = true;
+            document.getElementById("stopCameraBtn").disabled = false;
+            document.getElementById("playAslBtn").disabled = false;
+            document.getElementById("copyToTtsBtn").disabled = false;
+
+            // Update camera indicator
+            document.getElementById("cameraIndicator").classList.add("active");
+
+            // Start ASL detection
+            startASLDetection();
+
+            showAlert("Kamera berhasil dimulai!");
+          } catch (error) {
+            showAlert(error.message, "error");
+          }
+        });
+
+      // Add function to check if models are loaded
+      async function checkASLModels() {
+        try {
+          const response = await fetch("/asl-text");
+          const result = await response.json();
+          return true;
+        } catch (error) {
+          console.error("ASL models not ready:", error);
+          return false;
+        }
+      }
+
+      // Initialize the application
+      document.addEventListener("DOMContentLoaded", async function () {
+        console.log("TTS + ASL Application initialized");
+
+        // Check if ASL models are ready
+        const modelsReady = await checkASLModels();
+        if (!modelsReady) {
+          showAlert(
+            "Model ASL belum siap. Beberapa fitur mungkin tidak berfungsi.",
+            "error"
+          );
+        }
+      });
     </script>
-</body>
+  </body>
 </html>
