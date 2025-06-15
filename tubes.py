@@ -109,5 +109,12 @@ def cleanup_old_files():
     except Exception as e:
         return jsonify({'error': f'Gagal membersihkan: {str(e)}'}), 500
 
+latest_asl_text = ""
+
+@app.route('/asl-text', methods=['GET'])
+def get_asl_text():
+    global latest_asl_text
+    return jsonify({'text': latest_asl_text})
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

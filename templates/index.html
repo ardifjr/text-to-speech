@@ -255,6 +255,20 @@
             margin-top: 5px;
         }
 
+        .btn-gesture {
+            background-color: #ff9800;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .btn-gesture:hover {
+            background-color: #fb8c00;
+        }
+
         .char-counter.warning {
             color: #ff6b35;
         }
@@ -332,11 +346,13 @@
                 </div>
                 
                 <div class="button-group">
+                    <button type="button" id="aslBtn" class="btn-gesture">🤟 Bahasa Isyarat</button>
                     <button type="button" id="playBtn" class="btn-primary">▶️ Putar Suara</button>
                     <button type="button" id="pauseBtn" class="btn-secondary" disabled>⏸️ Jeda</button>
                     <button type="button" id="stopBtn" class="btn-secondary" disabled>⏹️ Berhenti</button>
                     <button type="button" id="downloadBtn" class="btn-success">💾 Unduh Audio</button>
                 </div>
+                <small id="aslStatus" style="display:block; margin-top:5px; color:gray;"></small>
             </form>
 
             <div class="loading" id="loading">
@@ -406,6 +422,8 @@
                     charCounter: document.getElementById('charCounter'),
                     micBtn: document.getElementById('micBtn'),
                     sttStatus: document.getElementById('sttStatus'),
+                    aslBtn: document.getElementById('aslBtn'),
+                    aslStatus: document.getElementById('aslStatus'),
                 };
             }
 
@@ -418,10 +436,38 @@
                 this.elements.textInput.addEventListener('input', () => this.updateCharCounter());
                 this.elements.micBtn.addEventListener('click', () => this.toggleSpeechToText());
                 this.initializeSpeechToText();
+                this.elements.aslBtn.addEventListener('click', () => this.toggleASLListener());
                 
                 // Update speed value on load
                 this.updateSpeedValue();
                 this.updateCharCounter();
+            }
+
+            toggleASLListener() {
+                if (this.aslInterval) {
+                    clearInterval(this.aslInterval);
+                    this.aslInterval = null;
+                    this.elements.aslStatus.textContent = '🛑 Bahasa Isyarat dimatikan';
+                    this.elements.aslBtn.textContent = '🤟 Bahasa Isyarat';
+                } else {
+                    this.aslInterval = setInterval(() => this.fetchASLText(), 1500);
+                    this.elements.aslStatus.textContent = '📡 Mendeteksi Bahasa Isyarat...';
+                    this.elements.aslBtn.textContent = '🛑 Stop ASL';
+                }
+            }
+
+            async fetchASLText() {
+                try {
+                    const res = await fetch('/asl-text');
+                    const data = await res.json();
+                    if (data.text && data.text !== '') {
+                        this.elements.textInput.value += data.text + ' ';
+                        this.updateCharCounter();
+                    }
+                } catch (err) {
+                    console.error("Gagal mengambil teks ASL:", err);
+                    this.showAlert("Gagal mengambil teks dari bahasa isyarat!", 'error');
+                }
             }
 
             updateCharCounter() {
